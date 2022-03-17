@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <title>Cute</title>
+</head>
+
+<body>
+    <br><br>
+
+    <main>
+
+        <div class="contenedor__todo">
+
+            <div class="caja__trasera">
+
+                <div class="caja__trasera-login">
+                    <h3>¿Ya tienes una cuenta?</h3>
+                    <p>Inicia sesion para entrar a la pagina</p>
+                    <button id="btn__iniciar-sesion">Iniciar sesion</button>
+                </div>
+                <div class="caja__trasera-register">
+                    <h3>¿Aun no tienes una cuenta?</h3>
+                    <p>Registrate para que puedas iniciar sesion</p>
+                    <button id="btn__registrarse">Registrarse</button>
+                </div>
+            </div>
+
+            <!--=====FORMULARIO DE LOGIN Y REGGISTRO DE USUARIOS=====-->
+            <div class="contenedor__login-register">
+                <!--===== LOGIN =====-->
+
+                <form action="<?php echo RUTA_URL?>/Login/LoginUsuario" class="formulario__login" method="POST">
+                    <h2>Iniciar Sesion</h2>
+                    <input type="email" name="correo" placeholder="Ingresar Correo" required>
+                    <input type="password" name="contraseña" placeholder="Ingresar contraseña" required>
+                    <button type="submit">Ingresar</button>
+                </form>
+
+
+                <!--===== REGISTRO DE USUARIOS =====-->
+                <form class="formulario__register" method="POST">
+                    <H2>Registrarse</H2>
+                    <input type="text" id="username" placeholder="Username">
+                    <input type="email" id="email" placeholder="Correo Electronico">
+                    <input type="password" id="password" placeholder="Contraseña">
+                    <button type="button" id="Regristrar">Registrarse</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    <script src="{% static 'js/home.js' %}"></script>
+</body>
+
+</html>
