@@ -39,12 +39,12 @@
                 
                 <form action="{% url 'login' %}" class="formulario__login" method="POST">{% csrf_token %}
                     {% if messages %}
-                    {% for message in messages %}
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <strong>{{message}}</strong>
-                      </div>
-                    {% endfor %}
-                {% endif%}
+                        {% for message in messages %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <strong>{{message}}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endif%}
                     <h2>Iniciar Sesion</h2>
                     <input name="email" type="email" placeholder="Ingresar Correo" required>
                     <input type="password" name="password" placeholder="Ingresar contraseña" required>
