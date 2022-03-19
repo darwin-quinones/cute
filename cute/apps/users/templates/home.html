@@ -40,30 +40,132 @@
                 <form action="{% url 'login' %}" class="formulario__login" method="POST">{% csrf_token %}
                     {% if messages %}
                         {% for message in messages %}
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <strong>{{message}}</strong>
-                            </div>
+                            {% if message.tags == 'error' %}
+                                <div {% if message.tags %} class="alert alert-danger alert-dismissible fade show"{% endif %} role="alert">
+                                    <strong>{{message}}</strong>
+                                </div>
+                            {% else %}
+                                <div {% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissible fade show"{% endif %} role="alert">
+                                    <strong>{{message}}</strong>
+                                </div>
+                            {% endif %}
+                            
                         {% endfor %}
                     {% endif%}
+
                     <h2>Iniciar Sesion</h2>
                     <input name="email" type="email" placeholder="Ingresar Correo" required>
                     <input type="password" name="password" placeholder="Ingresar contraseña" required>
-                    <button type="submit">Ingresar</button>
+                    <div class="row  justify-content-center">
+                        <button class="col-7"type="submit">Ingresar</button>
+                        <button class="col-7" id="btn_password_forgot" type="button">Olvidé mi contraseña</button>
+                    </div>
+                    
                 </form>
+
+       
 
 
                 <!--===== REGISTRO DE USUARIOS =====-->
-                <form class="formulario__register" method="POST">
+                <form class="formulario__register" action="/register" method="POST">{% csrf_token %}
                     <H2>Registrarse</H2>
-                    <input type="text" id="username" placeholder="Username">
-                    <input type="email" id="email" placeholder="Correo Electronico">
-                    <input type="password" id="password" placeholder="Contraseña">
+                    <input type="text" name="username" id="username" placeholder="Username" required>
+                    <input type="email" name="email" id="email" placeholder="Correo Electronico" required>
+                    <input type="password" name="password" id="password" placeholder="Contraseña" required>
                     <button type="submit" id="Regristrar">Registrarse</button>
                 </form>
+
+                <!--Reset password-->
+                <form id="form_password_forgot" class="formulario__login" method="POST">{% csrf_token %}
+
+                    <h2>Restablecer Contraseña</h2>
+                    <label for="" class="form-label">Escriba su correo para validar </label>
+                    <input type="text" class="form-control" id="reset_email" aria-describedby="helpId" placeholder="Ingresar Correo">
+                    
+                    <input type="password" id="new_password"  placeholder="Nueva contraseña">
+                    <input type="password" id="repet_password"  placeholder="Repetir contraseña">
+                    <div class="row  justify-content-center">
+                        <button id="btn_enviar" class="col-7"type="submit">Enviar</button>
+                        <button id="btn_cambiar"class="col-7"type="submit">Cambiar</button>
+                    </div>
+                    
+                </form>
+                         
             </div>
         </div>
     </main>
     <script src="{% static 'js/home.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+
+            function csrfSafeMethod(method) {
+                // these HTTP methods do not require CSRF protection
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    // if not safe, set csrftoken
+                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                    }
+                }
+            });
+
+
+            $('#form_password_forgot').hide()
+            $('#btn_cambiar').hide()
+            $('#new_password').hide()
+            $('#repet_password').hide()
+
+            $('#btn_password_forgot').click(function(){
+                $('#form_password_forgot').show()
+                $('#form_password_forgot').on('submit', function(event){
+                    event.preventDefault()
+                    validar_correo()
+                })
+            })
+
+            function validar_correo() {
+                let email = $('#reset_email').val();
+                console.log(email)
+                $.ajax({
+                    headers: {
+                        'Content-Type':'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    url: 'validar_email',
+                    type: 'POST',
+                    data: JSON.stringify({'email': email}),
+                    success: function(data) {
+                        console.log(data)   
+                    },
+                    error: function(){
+                        alert('fail')
+                    }
+
+                })
+                function getCookie(name) {
+                    var cookieValue = null;
+                    if (document.cookie && document.cookie != '') {
+                        var cookies = document.cookie.split(';');
+                        for (var i = 0; i < cookies.length; i++) {
+                            var cookie = jQuery.trim(cookies[i]);
+                            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+            }
+
+        })
+
+    </script>
 </body>
 
 </html>
