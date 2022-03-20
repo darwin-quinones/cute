@@ -78,8 +78,8 @@ def reset_password(request):
             user.save()
             return JsonResponse({'status': True})
         except:
-            pass
-    return JsonResponse({'status': True})
+            return JsonResponse({'data': 'no_existe'})
+    return JsonResponse({'status': False})
 
 def validar_email(request):
     if request.method == 'POST':

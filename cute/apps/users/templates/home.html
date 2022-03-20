@@ -111,66 +111,43 @@
             })
 
             function validar_correo() {
-                let email = $('#reset_email').val();
+                let email = $('#reset_email').val().trim();
                 let new_password = $('#new_password').val().trim()
                 let repet_password = $('#repet_password').val().trim()
-                data = {
-                    email: email,
-                    new_password: new_password,
-                    repet_password: repet_password
-                }
-                $.ajax({
-                    headers: {
-                        'Content-Type':'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    },
-                    url: "{% url 'reset_password' %}",
-                    type: 'POST',
-                    data: JSON.stringify(data),
-                    success: function(response) {
-                        alert('success')
-                        if (response['data'] == 'no_existe'){
-                            swal("Error!", "El email no existe, intenta de nuevo", "error");
-                        }
-                    },
-                    error: function(){
-                        swal("!Error!", "Algo salió mal", "error");
+
+                if(new_password === '' || repet_password === '' || email === ''){
+                    swal("Nota", "Debe llenar los campos", "info");
+                }else if(repet_password != new_password){
+                    swal("!Error!", "La contraseñas no coinciden", "error");
+                }else{
+                    data = {
+                        email: email,
+                        new_password: new_password,
                     }
-
-                })
-                
-                function reset_password(){
-                    
-
-                    if(new_password === '' || repet_password === ''){
-                        swal("Nota", "Debe llenar los campos", "info");
-                    }else if(repet_password != new_password){
-                        swal("!Error!", "La contraseñas no coinciden", "error");
-                    }else{
-                        id =  $('#id').val().trim();
-                        console.log(id)
-                        $.ajax({
-                            headers: {
-                                'Content-Type':'application/json',
-                                'X-CSRFToken': getCookie('csrftoken')
-                            },
-                            url: '{% url "reset_password" %}',
-                            type: 'POST',
-                            data: JSON.stringify({new_password: new_password}),
-                            success: function() {
-                                swal("Error!", "Contraseña cambiada exitosamente", "success");
-                                setTimeout(function() {
-                                    //location.reload();
-                                }, 3000);
-                            },
-                            error: function(){
-                                swal("!Error!", "Hubo un error", "error");
+                    $.ajax({
+                        headers: {
+                            'Content-Type':'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        url: "{% url 'reset_password' %}",
+                        type: 'POST',
+                        data: JSON.stringify(data),
+                        success: function(response) {
+                            console.log(response)
+                            if (response['data'] == 'no_existe'){
+                                swal("Error!", "El email no existe, intenta de nuevo", "error");
+                            }else{
+                                swal("!Exito!", "Contraseña cambiada exitosamente", "success");
                                 setTimeout(function() {
                                     location.reload();
                                 }, 3000);
                             }
-                        })
-                    }
+                        },
+                        error: function(){
+                            swal("!Error!", "Algo salió mal", "error");
+                        }
+    
+                    })
                 }
 
                 function getCookie(name) {
