@@ -78,14 +78,13 @@
                 <!--Reset password-->
                 <form id="form_password_forgot" class="formulario__login" method="POST">{% csrf_token %}
 
-                    <h2>Restablecer Contraseña</h2>
-                    <label for="" class="form-label">Escriba su correo para validar </label>
+                    <h2 >Restablecer Contraseña</h2>
+                    <label id="message" for="" class="form-label">Escriba su correo para validar </label>
                     <input type="text" class="form-control" id="reset_email" aria-describedby="helpId" placeholder="Ingresar Correo">
                     
                     <input type="password" id="new_password"  placeholder="Nueva contraseña">
                     <input type="password" id="repet_password"  placeholder="Repetir contraseña">
                     <div class="row  justify-content-center">
-                        <button id="btn_enviar" class="col-7"type="submit">Enviar</button>
                         <button id="btn_cambiar"class="col-7"type="submit">Cambiar</button>
                     </div>
                     
@@ -95,32 +94,15 @@
         </div>
     </main>
     <script src="{% static 'js/home.js' %}"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script type="text/javascript">
         $(document).ready(function(){
-            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-
-            function csrfSafeMethod(method) {
-                // these HTTP methods do not require CSRF protection
-                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-            }
-
-            $.ajaxSetup({
-                beforeSend: function (xhr, settings) {
-                    // if not safe, set csrftoken
-                    if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                    }
-                }
-            });
-
 
             $('#form_password_forgot').hide()
-            $('#btn_cambiar').hide()
-            $('#new_password').hide()
-            $('#repet_password').hide()
 
             $('#btn_password_forgot').click(function(){
+                $('#btn_password_forgot').hide()
                 $('#form_password_forgot').show()
                 $('#form_password_forgot').on('submit', function(event){
                     event.preventDefault()
@@ -130,23 +112,67 @@
 
             function validar_correo() {
                 let email = $('#reset_email').val();
-                console.log(email)
+                let new_password = $('#new_password').val().trim()
+                let repet_password = $('#repet_password').val().trim()
+                data = {
+                    email: email,
+                    new_password: new_password,
+                    repet_password: repet_password
+                }
                 $.ajax({
                     headers: {
                         'Content-Type':'application/json',
                         'X-CSRFToken': getCookie('csrftoken')
                     },
-                    url: 'validar_email',
+                    url: "{% url 'reset_password' %}",
                     type: 'POST',
-                    data: JSON.stringify({'email': email}),
-                    success: function(data) {
-                        console.log(data)   
+                    data: JSON.stringify(data),
+                    success: function(response) {
+                        alert('success')
+                        if (response['data'] == 'no_existe'){
+                            swal("Error!", "El email no existe, intenta de nuevo", "error");
+                        }
                     },
                     error: function(){
-                        alert('fail')
+                        swal("!Error!", "Algo salió mal", "error");
                     }
 
                 })
+                
+                function reset_password(){
+                    
+
+                    if(new_password === '' || repet_password === ''){
+                        swal("Nota", "Debe llenar los campos", "info");
+                    }else if(repet_password != new_password){
+                        swal("!Error!", "La contraseñas no coinciden", "error");
+                    }else{
+                        id =  $('#id').val().trim();
+                        console.log(id)
+                        $.ajax({
+                            headers: {
+                                'Content-Type':'application/json',
+                                'X-CSRFToken': getCookie('csrftoken')
+                            },
+                            url: '{% url "reset_password" %}',
+                            type: 'POST',
+                            data: JSON.stringify({new_password: new_password}),
+                            success: function() {
+                                swal("Error!", "Contraseña cambiada exitosamente", "success");
+                                setTimeout(function() {
+                                    //location.reload();
+                                }, 3000);
+                            },
+                            error: function(){
+                                swal("!Error!", "Hubo un error", "error");
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 3000);
+                            }
+                        })
+                    }
+                }
+
                 function getCookie(name) {
                     var cookieValue = null;
                     if (document.cookie && document.cookie != '') {
@@ -162,6 +188,8 @@
                     return cookieValue;
                 }
             }
+
+            
 
         })
 

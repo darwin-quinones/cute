@@ -59,8 +59,7 @@ def index(request):
         return redirect('home')
 
 def logout_request(request):
-    email = request.POST.get('email')
-    print(email)
+
     try:
         del request.session['id']
         logout(request)
@@ -71,13 +70,24 @@ def logout_request(request):
     return redirect('home')
     
 def reset_password(request):
-    print('reset')
-    return redirect('home')
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        try:
+            user = User.objects.get(email=data['email'])
+            user.password = data['new_password']
+            user.save()
+            return JsonResponse({'status': True})
+        except:
+            pass
+    return JsonResponse({'status': True})
 
 def validar_email(request):
     if request.method == 'POST':
-        
-        print(request.body)
         data = json.loads(request.body)
-    return JsonResponse({'status': True})
+        try:
+            user = User.objects.get(email=data['email'])
+            return JsonResponse({'data':user.id })
+        except:
+            pass
+    return JsonResponse({'data': 'no_existe'})
     
