@@ -133,7 +133,6 @@
                         type: 'POST',
                         data: JSON.stringify(data),
                         success: function(response) {
-                            console.log(response)
                             if (response['data'] == 'no_existe'){
                                 swal("Error!", "El email no existe, intenta de nuevo", "error");
                             }else{

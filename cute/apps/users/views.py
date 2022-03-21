@@ -21,7 +21,7 @@ def login(request):
                 request.session['id'] = user.id
                 request.session['username'] = user.username
                 request.session['email'] = user.email
-                messages.success(request, f'{user.username} Logeado exitosamente')
+                messages.success(request, f'{user.username.capitalize()} logeado exitosamente')
                 return redirect('index')
             else:
                 messages.error(request, 'Contraseña incorrecta')
@@ -81,13 +81,5 @@ def reset_password(request):
             return JsonResponse({'data': 'no_existe'})
     return JsonResponse({'status': False})
 
-def validar_email(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        try:
-            user = User.objects.get(email=data['email'])
-            return JsonResponse({'data':user.id })
-        except:
-            pass
-    return JsonResponse({'data': 'no_existe'})
+
     
